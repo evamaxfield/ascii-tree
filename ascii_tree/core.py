@@ -11,13 +11,14 @@ LAST = "└── "
 ###############################################################################
 
 
-def build_tree_structure(paths: list[str] | dict[str, float]) -> dict[str, dict | str]:
+def build_tree_structure(paths: list[str] | dict[str, int]) -> dict:
     """Build a nested dictionary representing the directory tree structure."""
-    tree = {}
+    tree: dict = {}
 
-    # Handle both list of strings and dict of string->float
+    # Handle both list of strings and dict of string->int
+    path_items: list[tuple[str, int | None]]
     if isinstance(paths, dict):
-        path_items = paths.items()
+        path_items = list(paths.items())
     else:
         path_items = [(path, None) for path in paths]
 
@@ -44,27 +45,31 @@ def build_tree_structure(paths: list[str] | dict[str, float]) -> dict[str, dict 
 def separate_dirs_and_files(items: list[tuple]) -> tuple[list[tuple], list[tuple]]:
     """
     Separate items into directories and files based on whether they have children.
-    
-    Returns:
+
+    Returns
+    -------
         (directories, files)
     """
-    directories = []
-    files = []
-    
+    directories: list[tuple] = []
+    files: list[tuple] = []
+
     for name, node_info in items:
         if node_info["_children"]:  # Has children, so it's a directory
             directories.append((name, node_info))
         else:  # No children, so it's a file
             files.append((name, node_info))
-    
+
     return directories, files
 
 
-def get_limited_items(items: list[tuple], max_items: int, sort_by_size: bool = False) -> tuple[list[tuple], int]:
+def get_limited_items(
+    items: list[tuple], max_items: int, sort_by_size: bool = False
+) -> tuple[list[tuple], int]:
     """
     Get the items to display based on limits and sorting preferences.
 
-    Returns:
+    Returns
+    -------
         (items_to_show, truncated_count)
     """
     if len(items) <= max_items:
@@ -72,17 +77,19 @@ def get_limited_items(items: list[tuple], max_items: int, sort_by_size: bool = F
 
     if sort_by_size:
         # Sort by size (largest first), handling None sizes
-        items_sorted = sorted(items, key=lambda x: x[1].get("_size", 0) or 0, reverse=True)
+        items_sorted = sorted(
+            items, key=lambda x: x[1].get("_size", 0) or 0, reverse=True
+        )
         return items_sorted[:max_items], len(items) - max_items
     else:
         # Just take the first items
         return items[:max_items], len(items) - max_items
 
 
-def format_file_name(name: str, node_info: dict[str, dict | str], show_sizes: bool = False) -> str:
+def format_file_name(name: str, node_info: dict, show_sizes: bool = False) -> str:
     """Format the file/directory name with optional size information."""
     if show_sizes and node_info.get("_size") is not None:
-        size = node_info["_size"]
+        size: int = node_info["_size"]
         if size >= 1024 * 1024 * 1024:  # GB
             size_str = f"{size / (1024**3):.1f}GB"
         elif size >= 1024 * 1024:  # MB
@@ -96,7 +103,7 @@ def format_file_name(name: str, node_info: dict[str, dict | str], show_sizes: bo
 
 
 def render_tree(
-    tree_dict: dict[str, dict | str],
+    tree_dict: dict,
     prefix: str = "",
     max_depth: int | None = None,
     current_depth: int = 0,
@@ -105,7 +112,7 @@ def render_tree(
     sort_by_size: bool = False,
     show_sizes: bool = False,
 ) -> list[str]:
-    """Recursively render the tree structure as ASCII art with separate limits for files and directories."""
+    """Recursively render the tree structure as ASCII art."""
     lines = []
 
     # Check depth limit
@@ -113,15 +120,23 @@ def render_tree(
         lines.append(prefix + TEE + "... (depth limit reached)")
         return lines
 
-    items = list(tree_dict.items())
-    
+    items: list[tuple] = list(tree_dict.items())
+
     # Separate directories and files
     directories, files = separate_dirs_and_files(items)
-    
+
     # Apply limits separately to directories and files
-    dirs_to_show, dirs_truncated = (directories, 0) if max_dirs_per_dir is None else get_limited_items(directories, max_dirs_per_dir, sort_by_size)
-    files_to_show, files_truncated = (files, 0) if max_files_per_dir is None else get_limited_items(files, max_files_per_dir, sort_by_size)
-    
+    dirs_to_show, dirs_truncated = (
+        (directories, 0)
+        if max_dirs_per_dir is None
+        else get_limited_items(directories, max_dirs_per_dir, sort_by_size)
+    )
+    files_to_show, files_truncated = (
+        (files, 0)
+        if max_files_per_dir is None
+        else get_limited_items(files, max_files_per_dir, sort_by_size)
+    )
+
     # Combine directories and files for display (directories first)
     all_items_to_show = dirs_to_show + files_to_show
     total_truncated = dirs_truncated + files_truncated
@@ -163,7 +178,7 @@ def render_tree(
             truncation_messages.append(f"{dirs_truncated} more directories")
         if files_truncated > 0:
             truncation_messages.append(f"{files_truncated} more files")
-        
+
         truncation_text = " and ".join(truncation_messages)
         pointer = LAST
         lines.append(prefix + pointer + f"... ({truncation_text})")
@@ -172,7 +187,7 @@ def render_tree(
 
 
 def paths_to_tree(
-    paths: list[str] | dict[str, float],
+    paths: list[str] | dict[str, int],
     max_depth: int | None = None,
     max_files_per_dir: int | None = None,
     max_dirs_per_dir: int | None = None,
@@ -180,35 +195,20 @@ def paths_to_tree(
     show_sizes: bool = False,
 ) -> str:
     """
-    Convert a list of file paths or dict of paths->sizes to an ASCII tree representation.
+    Convert a list of file paths or dict of paths->sizes to an ASCII tree.
 
     Args:
+    ----
         paths: List of file path strings OR dict of path -> file size in bytes
         max_depth: Maximum depth to display (None for unlimited)
         max_files_per_dir: Maximum files per directory to display (None for unlimited)
-        max_dirs_per_dir: Maximum subdirectories per directory to display (None for unlimited)
+        max_dirs_per_dir: Maximum subdirs per directory to display (None for unlimited)
         sort_by_size: If True and limits are set, show largest files/dirs first
         show_sizes: If True, display file sizes next to filenames (requires dict input)
 
     Returns:
+    -------
         String containing the ASCII tree representation
-
-    Example:
-        >>> paths = [
-        ...     "src/main.py",
-        ...     "src/utils/helpers.py",
-        ...     "src/utils/config.py",
-        ...     "tests/test_main.py",
-        ...     "README.md"
-        ... ]
-        >>> print(paths_to_tree(paths, max_depth=2, max_files_per_dir=2, max_dirs_per_dir=1))
-
-        >>> path_sizes = {
-        ...     "src/main.py": 1024,
-        ...     "src/utils/helpers.py": 2048,
-        ...     "README.md": 512
-        ... }
-        >>> print(paths_to_tree(path_sizes, sort_by_size=True, show_sizes=True))
     """
     if not paths:
         return ""
@@ -227,5 +227,3 @@ def paths_to_tree(
     )
 
     return "\n".join(tree_lines)
-
-

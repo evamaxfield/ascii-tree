@@ -121,8 +121,12 @@ MAX_FILES_3_FROM_LIST = """
     ],
 )
 def test_paths_to_tree(
-    paths, max_depth, max_files_per_dir, max_dirs_per_dir, expected_output
-):
+    paths: list[str],
+    max_depth: int,
+    max_files_per_dir: int,
+    max_dirs_per_dir: int,
+    expected_output: str,
+) -> None:
     result = ascii_tree(
         paths,
         max_depth=max_depth,
@@ -190,8 +194,12 @@ SORTED_SIZES_MAX_DEPTH_4_MAX_FILES_3_MAX_DIRS_1_FROM_DICT = """
 └── ... (1 more directories)
 """.strip()
 
+
 @pytest.mark.parametrize(
-    "paths, max_depth, max_files_per_dir, max_dirs_per_dir, sort_by_size, show_sizes, expected_output",
+    (
+        "paths, max_depth, max_files_per_dir, max_dirs_per_dir, "
+        "sort_by_size, show_sizes, expected_output"
+    ),
     [
         (DICT_OF_PATHS_INPUT, None, None, None, False, True, SHOW_FILE_SIZES_FROM_DICT),
         (
@@ -215,8 +223,14 @@ SORTED_SIZES_MAX_DEPTH_4_MAX_FILES_3_MAX_DIRS_1_FROM_DICT = """
     ],
 )
 def test_paths_to_tree_with_dict(
-    paths, max_depth, max_files_per_dir, max_dirs_per_dir, sort_by_size, show_sizes, expected_output
-):
+    paths: dict[str, int],
+    max_depth: int,
+    max_files_per_dir: int,
+    max_dirs_per_dir: int,
+    sort_by_size: bool,
+    show_sizes: bool,
+    expected_output: str,
+) -> None:
     result = ascii_tree(
         paths,
         max_depth=max_depth,
