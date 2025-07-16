@@ -3,6 +3,12 @@
 Create ASCII tree strings from list or directories of filepaths.
 Useful for formatting directory information into LLM context window.
 
+## Installation
+
+```bash
+pip install py-ascii-tree
+```
+
 ## Example usage
 
 ### Basic Usage with Strings
