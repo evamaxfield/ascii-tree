@@ -14,6 +14,8 @@ pip install py-ascii-tree
 ### Basic Usage with Strings
 
 ```python
+from py_ascii_tree import ascii_tree
+
 example_paths = [
     "src/main.py",
     "src/utils/helpers.py",
@@ -34,19 +36,19 @@ example_paths = [
 ]
 
 print("1. Basic tree (no limits):")
-print(paths_to_tree(example_paths))
+print(ascii_tree(example_paths))
 print("\n" + "=" * 60 + "\n")
 
 print("2. With depth limit (max_depth=2):")
-print(paths_to_tree(example_paths, max_depth=2))
+print(ascii_tree(example_paths, max_depth=2))
 print("\n" + "=" * 60 + "\n")
 
 print("3. With separate file and directory limits (max_files_per_dir=2, max_dirs_per_dir=1):")
-print(paths_to_tree(example_paths, max_files_per_dir=2, max_dirs_per_dir=1))
+print(ascii_tree(example_paths, max_files_per_dir=2, max_dirs_per_dir=1))
 print("\n" + "=" * 60 + "\n")
 
 print("4. With file limit only (max_files_per_dir=3):")
-print(paths_to_tree(example_paths, max_files_per_dir=3))
+print(ascii_tree(example_paths, max_files_per_dir=3))
 print("\n" + "=" * 60 + "\n")
 ```
 
@@ -145,6 +147,8 @@ print("\n" + "=" * 60 + "\n")
 ### Usage with Dictionary for Path and File Size
 
 ```python
+from py_ascii_tree import ascii_tree
+
 path_sizes = {
     "src/main.py": 2048,
     "src/utils/helpers.py": 1024,
@@ -158,12 +162,12 @@ path_sizes = {
 }
 
 print("5. With file sizes displayed:")
-print(paths_to_tree(path_sizes, show_sizes=True))
+print(ascii_tree(path_sizes, show_sizes=True))
 print("\n" + "=" * 60 + "\n")
 
 print("6. Sorted by size, 2 files per directory, 1 subdir per directory, sizes shown:")
 print(
-    paths_to_tree(
+    ascii_tree(
         path_sizes,
         max_files_per_dir=2,
         max_dirs_per_dir=1,
@@ -175,7 +179,7 @@ print("\n" + "=" * 60 + "\n")
 
 print("7. All limits combined:")
 print(
-    paths_to_tree(
+    ascii_tree(
         path_sizes,
         max_depth=4,
         max_files_per_dir=3,
