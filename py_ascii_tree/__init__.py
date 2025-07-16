@@ -1,9 +1,9 @@
-"""Top-level package for ascii-tree."""
+"""Top-level package for py-ascii-tree."""
 
 from importlib.metadata import PackageNotFoundError, version
 
 try:
-    __version__ = version("ascii-tree")
+    __version__ = version("py-ascii-tree")
 except PackageNotFoundError:
     __version__ = "uninstalled"
 

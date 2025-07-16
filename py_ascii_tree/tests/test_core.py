@@ -2,7 +2,7 @@
 
 import pytest
 
-from ascii_tree import ascii_tree
+from py_ascii_tree import ascii_tree
 
 ###############################################################################
 
